@@ -40,7 +40,9 @@ antigen bundle mafredri/zsh-async
 IP_SSH_CLIENT=$(echo $SSH_CLIENT | awk '{print $1;}')
 
 if [ -n "${POWERLEVEL9K_COMPATIBLE}" ]; then
-   if [ "${IP_SSH_CLIENT}" = "2a01:cb05:898d:a300:1ac0:4dff:fe00:573" ]; then
+   if [ -z "${SSH_CLIENT}" ]; then
+      THEME="POWERLEVEL9K"
+   elif [ "${IP_SSH_CLIENT}" = "2a01:cb05:898d:a300:1ac0:4dff:fe00:573" ]; then
       THEME="POWERLEVEL9K"
    fi
 fi
@@ -74,5 +76,9 @@ fi
 if [ -e ~/bin/zsh_alias ]
 then
 	source ~/bin/zsh_alias
+fi
+
+if [ -n "${SSH_CLIENT}" ]; then
+   touch ~/.zshrc
 fi
 
