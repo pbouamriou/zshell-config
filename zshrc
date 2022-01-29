@@ -1,8 +1,12 @@
 case "$TERM" in
-	xterm-color|*-256color) ;;
+	xterm-color|*-256color) POWERLEVEL9K_COMPATIBLE=1;;
 	xterm) ;;
-	screen) export TERM=xterm-256color;;
+	screen) export TERM=xterm-256color; POWERLEVEL9K_COMPATIBLE=1;;
 esac
+
+if [ -n "${SSH_CLIENT}" ]; then
+   touch ~/.zshrc
+fi
 
 screenfetch=$(which screenfetch)
 if [ ! -z "${screenfetch}" ]; then
@@ -19,7 +23,7 @@ antigen bundle git
 antigen bundle heroku
 antigen bundle pip
 antigen bundle lein
-antigen bundle cargo
+antigen bundle rust
 antigen bundle colorize
 antigen bundle colored-man-pages
 antigen bundle docker-compose
@@ -29,21 +33,27 @@ antigen bundle command-not-found
 antigen bundle bobsoppe/zsh-ssh-agent
 antigen bundle jimeh/zsh-peco-history
 antigen bundle cakecatz/zsh-peco-ghq
-
-# Syntax highlighting bundle.
 antigen bundle zsh-users/zsh-syntax-highlighting
-
-# Async
+antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle mafredri/zsh-async
 
-# Auto suggestions
-antigen bundle zsh-users/zsh-autosuggestions
+IP_SSH_CLIENT=$(echo $SSH_CLIENT | awk '{print $1;}')
 
-# Load the theme.
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_INSTALLATION_PATH=$ANTIGEN_BUNDLES/bhilburn/powerlevel9k
-POWERLEVEL9K_MODE='awesome-patched'
-antigen theme bhilburn/powerlevel9k powerlevel9k
+if [ -n "${POWERLEVEL9K_COMPATIBLE}" ]; then
+   if [ "${IP_SSH_CLIENT}" = "2a01:cb05:898d:a300:1ac0:4dff:fe00:573" ]; then
+      THEME="POWERLEVEL9K"
+   fi
+fi
+
+if [ "${THEME}" = "POWERLEVEL9K" ]; then
+   # Load the theme.
+   POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+   POWERLEVEL9K_INSTALLATION_PATH=$ANTIGEN_BUNDLES/bhilburn/powerlevel9k
+   POWERLEVEL9K_MODE='awesome-patched'
+   antigen theme bhilburn/powerlevel9k powerlevel9k
+else
+   antigen theme sindresorhus/pure@main
+fi
 
 # Tell Antigen that you're done.
 antigen apply
